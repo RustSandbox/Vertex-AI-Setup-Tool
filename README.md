@@ -3,6 +3,7 @@
 A powerful command-line tool for setting up and testing Google Cloud Vertex AI integration. This tool automates the process of enabling Vertex AI services, managing authentication, and testing API calls.
 
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor%20on%20GitHub-%23EA4AAA?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sponsors/hghalebi)
+[![Crates.io](https://img.shields.io/crates/v/hvertex.svg)](https://crates.io/crates/hvertex)
 
 ## ✨ Features
 
@@ -25,7 +26,13 @@ Before using this tool, ensure you have:
 
 ## 📦 Installation
 
-### Option 1: One-Step Setup (Recommended)
+### Option 1: Install via crates.io (Recommended)
+
+```bash
+cargo install hvertex
+```
+
+### Option 2: One-Step Setup from Source
 
 ```bash
 # Clone the repository
@@ -39,7 +46,7 @@ cargo build --release
 cargo run --release
 ```
 
-### Option 2: Manual Installation
+### Option 3: Manual Installation
 
 If you prefer to install manually:
 
@@ -127,4 +134,4 @@ If you find this tool useful, please consider sponsoring me on GitHub to support
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
