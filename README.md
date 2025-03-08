@@ -29,8 +29,8 @@ Before using this tool, ensure you have:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/hvertex.git
-cd hvertex
+git clone git@github.com:RustSandbox/Vertex-AI-Setup-Tool.git
+cd Vertex-AI-Setup-Tool
 
 # Build in release mode
 cargo build --release
