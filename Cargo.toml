@@ -1,6 +1,6 @@
 [package]
 name = "hvertex"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Hamze Ghalebi <ghalebi@gmail.com>"]
 description = "A powerful command-line tool for setting up and testing Google Cloud Vertex AI integration"
@@ -10,6 +10,7 @@ readme = "README.md"
 keywords = ["vertex-ai", "google-cloud", "ai", "machine-learning", "cli"]
 categories = ["command-line-utilities", "development-tools", "api-bindings"]
 homepage = "https://github.com/RustSandbox/Vertex-AI-Setup-Tool"
+documentation = "https://docs.rs/hvertex"
 
 [dependencies]
 anyhow = "1.0"
@@ -19,3 +20,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 dotenv = "0.15"
 dialoguer = "0.11"
+thiserror = "1.0"
+
+[dev-dependencies]
+doc-comment = "0.3"
