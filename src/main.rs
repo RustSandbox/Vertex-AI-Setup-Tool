@@ -7,6 +7,8 @@ use std::{
     env,
     io::{self, Write},
     process::{Command, Output},
+    fs::File,
+    path::PathBuf,
 };
 
 /// Represents a Vertex AI model
@@ -21,6 +23,31 @@ struct VertexAIModel {
     description: String,
 }
 
+/// Checks if required environment variables are set
+fn check_environment_variables() -> Result<()> {
+    println!("\n{}", "Checking environment variables...".blue().bold());
+    
+    // Check for VERTEX_AI_PROJECT_ID
+    match env::var("VERTEX_AI_PROJECT_ID") {
+        Ok(project_id) => println!("✅ VERTEX_AI_PROJECT_ID is set: {}", project_id.cyan()),
+        Err(_) => println!("❌ VERTEX_AI_PROJECT_ID is not set"),
+    }
+    
+    // Check for Google Cloud credentials
+    match env::var("GOOGLE_APPLICATION_CREDENTIALS") {
+        Ok(creds) => println!("✅ GOOGLE_APPLICATION_CREDENTIALS is set: {}", creds.cyan()),
+        Err(_) => println!("❌ GOOGLE_APPLICATION_CREDENTIALS is not set"),
+    }
+    
+    // Check for access token
+    match get_access_token() {
+        Ok(_) => println!("✅ Access token is available"),
+        Err(_) => println!("❌ Access token is not available"),
+    }
+    
+    Ok(())
+}
+
 /// Main entry point for the application
 fn main() -> Result<()> {
     // Print a welcome message with styling
@@ -28,6 +55,9 @@ fn main() -> Result<()> {
     println!("{}", "===================".green());
     println!("This tool will help you set up Google Cloud Vertex AI for your project.");
     println!();
+
+    // Load existing environment variables if any
+    load_environment()?;
 
     // Step 1: Ensure Vertex AI is enabled for the project
     ensure_vertex_ai_project()?;
@@ -38,10 +68,13 @@ fn main() -> Result<()> {
     // Step 3: Setup authentication for API access
     setup_authentication()?;
     
-    // Step 4: Test the Vertex AI API with a simple text generation request
+    // Step 4: Check environment variables
+    check_environment_variables()?;
+    
+    // Step 5: Test the Vertex AI API with a simple text generation request
     test_vertex_ai_api_call()?;
     
-    // Step 5: Print instructions for using the authentication in the future
+    // Step 6: Print instructions for using the authentication in the future
     print_authentication_instructions();
 
     Ok(())
@@ -170,15 +203,14 @@ fn list_vertex_ai_models() -> Result<Vec<VertexAIModel>> {
 /// Sets up authentication for the Vertex AI API
 ///
 /// This function sets up authentication using gcloud auth application-default
-/// login command, which is the recommended method for authenticating with
-/// Google Cloud APIs.
+/// login command and automatically sets up environment variables.
 fn setup_authentication() -> Result<()> {
     println!("\n{}", "Step 3: Setting up authentication...".blue().bold());
     println!("For Vertex AI API access, we will use Application Default Credentials (ADC)");
     
-    // Execute gcloud auth application-default login command
+    // Execute gcloud auth application-default login command with --quiet flag
     let output = Command::new("gcloud")
-        .args(["auth", "application-default", "login"])
+        .args(["auth", "application-default", "login", "--quiet"])
         .output()
         .context("Failed to execute gcloud auth application-default login command")?;
 
@@ -196,9 +228,47 @@ fn setup_authentication() -> Result<()> {
     let project_id = get_project_id()?;
     println!("✅ Using Google Cloud project: {}", project_id.cyan());
     
-    // Store project ID in environment variable for future use
-    env::set_var("VERTEX_AI_PROJECT_ID", project_id);
+    // Set environment variables
+    env::set_var("VERTEX_AI_PROJECT_ID", &project_id);
+    
+    // Create .env file in the project root
+    let env_path = PathBuf::from(".env");
+    let mut env_file = File::create(&env_path)
+        .context("Failed to create .env file")?;
+    
+    // Write environment variables to .env file
+    writeln!(env_file, "VERTEX_AI_PROJECT_ID={}", project_id)
+        .context("Failed to write to .env file")?;
+    
+    // Get the path to the application default credentials
+    let adc_path = Command::new("gcloud")
+        .args(["auth", "application-default", "print-access-token"])
+        .output()
+        .context("Failed to get ADC path")?;
+    
+    if adc_path.status.success() {
+        let adc_path_str = String::from_utf8_lossy(&adc_path.stdout).trim().to_string();
+        writeln!(env_file, "GOOGLE_APPLICATION_CREDENTIALS={}", adc_path_str)
+            .context("Failed to write ADC path to .env file")?;
+    }
 
+    println!("✅ Environment variables have been set and saved to .env file");
+    println!("✅ You can now use these variables in your applications");
+
+    Ok(())
+}
+
+/// Loads environment variables from .env file
+///
+/// This function loads environment variables from the .env file
+/// if it exists, otherwise it uses the current environment.
+fn load_environment() -> Result<()> {
+    // Check if .env file exists
+    if PathBuf::from(".env").exists() {
+        // Load .env file
+        dotenv::dotenv().context("Failed to load .env file")?;
+        println!("✅ Loaded environment variables from .env file");
+    }
     Ok(())
 }
 
@@ -273,7 +343,7 @@ fn test_vertex_ai_api_call() -> Result<()> {
                 "role": "user",
                 "parts": [
                     {
-                        "text": "Who is Hamze Ghalebi? Please provide information about their background, achievements, and contributions."
+                        "text": "Who is Hamze Ghalebi? Please provide information about their background, achievements, and contributions. Include details about their role as CTO at Remolab, their work with Welcome Place, and their expertise in technology and entrepreneurship."
                     }
                 ]
             }

@@ -1,97 +1,128 @@
-# Vertex AI Setup Tool
+# 🚀 Vertex AI Setup Tool
 
-A Rust-based command-line tool for setting up and testing Google Cloud Vertex AI integration. This tool helps you:
-- Enable Vertex AI service
-- List available models
-- Set up authentication
-- Test API calls with Gemini Pro 2 model and Google Search grounding
+A Rust command-line utility that automates Google Cloud Vertex AI setup and testing with a rich, interactive terminal interface.
 
-## Prerequisites
+## ✨ Features
 
-- Rust 1.70 or later
-- Google Cloud SDK installed
-- A Google Cloud project with billing enabled
-- Appropriate permissions to enable services and make API calls
+* **🔧 Automatic Service Enablement**: Checks and enables Vertex AI service if needed
+* **📋 Model Discovery**: Lists available Vertex AI models in your project
+* **🔑 Authentication Setup**: Automatically configures Application Default Credentials (ADC)
+* **🔍 Environment Management**: Sets up and manages environment variables
+* **🎨 Rich Terminal Interface**: Beautiful ASCII art, animations, and color-coded information
+* **🔬 API Testing**: Built-in test functionality with Gemini Pro 2 model
+* **📚 Comprehensive Documentation**: Detailed instructions for future API usage
 
-## Installation
+## 🛠️ Prerequisites
 
-1. Clone the repository:
+Before using this tool, ensure you have:
+
+1. Rust and Cargo installed
+2. Google Cloud SDK (gcloud CLI) installed and configured
+3. Active Google Cloud project with billing enabled
+4. Appropriate IAM permissions (e.g., `roles/aiplatform.user`)
+
+## 📦 Installation
+
+### Option 1: One-Step Setup (Recommended)
+
 ```bash
-git clone https://github.com/yourusername/vertex-ai-setup.git
-cd vertex-ai-setup
-```
+# Clone the repository
+git clone https://github.com/yourusername/hvertex.git
+cd hvertex
 
-2. Build the project:
-```bash
+# Build in release mode
 cargo build --release
-```
 
-## Usage
-
-Run the tool:
-```bash
+# Run the tool
 cargo run --release
 ```
 
-The tool will:
-1. Check if Vertex AI is enabled and enable it if necessary
-2. List available models using `gcloud ai models list`
-3. Set up authentication using Application Default Credentials (ADC)
-4. Test the API with a sample query using Gemini Pro 2 model with Google Search grounding
-5. Display instructions for future API usage
+### Option 2: Manual Installation
 
-## Features
+If you prefer to install manually:
 
-- **Automatic Service Enablement**: Checks and enables Vertex AI service if needed
-- **Model Discovery**: Lists available Vertex AI models in your project
-- **Authentication Setup**: Configures Application Default Credentials (ADC)
-- **API Testing**: Tests the Vertex AI API using Gemini Pro 2 model
-- **Google Search Grounding**: Utilizes Google Search to enhance responses with real-time information
-- **Comprehensive Documentation**: Provides detailed instructions for future API usage
+```bash
+# Build the release version
+cargo build --release
 
-## API Usage Examples
+# Copy to a directory in your PATH
+mkdir -p ~/.local/bin
+cp target/release/hvertex ~/.local/bin/
+chmod +x ~/.local/bin/hvertex
 
-The tool provides examples for using the Vertex AI API in various programming languages:
-
-### Python
-```python
-from google.cloud import aiplatform
-
-# Initialize the Vertex AI SDK
-aiplatform.init(project='YOUR_PROJECT_ID', location='us-central1')
+# Add to PATH if needed
+echo 'export PATH=$PATH:~/.local/bin' >> ~/.zshrc  # or ~/.bashrc
+source ~/.zshrc  # or ~/.bashrc
 ```
 
-### Rust
-```rust
-use std::process::Command;
+## 🚀 Usage
 
-fn get_access_token() -> Result<String, Box<dyn std::error::Error>> {
-    let output = Command::new("gcloud")
-        .args(["auth", "print-access-token"])
-        .output()?;
-    Ok(String::from_utf8(output.stdout)?.trim().to_string())
-}
+Run the application:
+
+```bash
+hvertex
 ```
 
-## Troubleshooting
+The application will guide you through:
 
-1. If you encounter permission issues:
-   - Ensure you have the necessary IAM roles (e.g., `roles/aiplatform.user`)
-   - Run `gcloud auth login` and `gcloud auth application-default login`
+1. 🔍 Checking/enabling Vertex AI service
+2. 📊 Listing available models
+3. 🔑 Setting up authentication
+4. 🔍 Verifying environment variables
+5. 🔬 Testing the API with Gemini Pro 2
+6. 📚 Displaying usage instructions
 
-2. If models are not listed:
-   - Run `gcloud ai models list --region=us-central1` manually to verify access
-   - Check if your project has billing enabled
+## 🧩 How It Works
 
-3. If API calls fail:
-   - Verify your authentication is set up correctly
-   - Check if the Vertex AI service is enabled
-   - Ensure your project has sufficient quota
+1. The tool checks if Vertex AI service is enabled in your project
+2. Lists available Vertex AI models in your project
+3. Sets up authentication using Application Default Credentials (ADC)
+4. Configures environment variables for API access
+5. Tests the API using the Gemini Pro 2 model
+6. Provides comprehensive documentation for future use
 
-## Contributing
+## 🎨 Terminal Interface
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+The application includes:
 
-## License
+* **📊 ASCII Art Banner**: Beautiful welcome banner
+* **🎬 Animations**: Typing effects, spinners, and progress bars
+* **🎨 Color-Coded Information**: Different colors for different types of information
+* **📦 Boxed Messages**: Important information displayed in stylish boxes
+
+## ⚙️ Customization
+
+Modify the `config.rs` file to customize:
+
+* **Animation Settings**: Enable/disable animations and timing
+* **Color Schemes**: Change the color theme
+* **Emojis**: Customize emojis used for different messages
+
+## 🔧 Troubleshooting
+
+If you encounter issues:
+
+* Ensure you're authenticated with gcloud: `gcloud auth login`
+* Verify your active project: `gcloud config get-value project`
+* Check Vertex AI permissions in Google Cloud Console
+* Run with verbose output: `RUST_LOG=debug hvertex`
+
+## 👨‍💻 About the Author
+
+I'm Hamze Ghalebi, CTO at Remolab, passionate about building tools that improve developer workflows. This Vertex AI Setup Tool is part of a collection of tools I originally built for my own use, and I've decided to open source it in case others find it helpful.
+
+Many of the tools I create solve specific pain points in my daily workflow with cloud infrastructure and development environments. If you have any feedback or suggestions for improvements, please feel free to contribute!
+
+### Connect with me:
+
+* GitHub: [hghalebi](https://github.com/hghalebi)
+* Twitter/X: [@hamzeml](https://twitter.com/hamzeml)
+* LinkedIn: [Hamze Ghalebi](https://linkedin.com/in/hamzeghalebi)
+
+### Support this project:
+
+If you find this tool useful, please consider sponsoring me on GitHub to support continued development and maintenance.
+
+## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details. 
