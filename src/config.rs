@@ -1,7 +1,8 @@
 //! Configuration module for the Vertex AI Setup Tool
-//! 
+//!
 //! This module provides configuration structures and utilities for the tool.
 
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 /// Configuration for the Vertex AI setup tool
@@ -48,4 +49,4 @@ pub enum ConfigError {
 }
 
 /// Result type for configuration operations
-pub type ConfigResult<T> = Result<T, ConfigError>; 
+pub type ConfigResult<T> = Result<T>;

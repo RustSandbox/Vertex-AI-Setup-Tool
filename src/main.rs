@@ -1,34 +1,34 @@
 //! # Vertex AI Setup Tool
-//! 
+//!
 //! A powerful command-line tool for setting up and testing Google Cloud Vertex AI integration.
 //! This tool automates the process of enabling Vertex AI services, managing authentication,
 //! and testing API calls.
-//! 
+//!
 //! ## Features
-//! 
+//!
 //! - Automatic service enablement
 //! - Model discovery
 //! - Authentication setup
 //! - Environment management
 //! - Rich terminal interface
 //! - API testing
-//! 
+//!
 //! ## Example
-//! 
+//!
 //! ```bash
 //! cargo install hvertex
 //! hvertex
 //! ```
-//! 
+//!
 //! ## Configuration
-//! 
+//!
 //! The tool can be configured through environment variables:
-//! 
+//!
 //! - `VERTEX_AI_PROJECT_ID`: Your Google Cloud project ID
 //! - `GOOGLE_APPLICATION_CREDENTIALS`: Path to your service account key file
-//! 
+//!
 //! ## License
-//! 
+//!
 //! This project is licensed under the MIT License.
 
 use anyhow::{Context, Result};
@@ -82,9 +82,9 @@ fn check_environment_variables() -> Result<()> {
 }
 
 /// Main entry point for the application
-/// 
+///
 /// # Returns
-/// 
+///
 /// * `Result<(), Box<dyn std::error::Error>>` - Success or error status
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Print a welcome message with styling
@@ -123,9 +123,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// If not, it attempts to enable it using the gcloud services enable command.
 ///
 /// # Returns
-/// 
-/// * `Result<(), std::io::Error>` - Success or error status
-fn ensure_vertex_ai_project() -> Result<(), std::io::Error> {
+///
+/// * `Result<(), anyhow::Error>` - Success or error status
+fn ensure_vertex_ai_project() -> Result<(), anyhow::Error> {
     println!(
         "{}",
         "Step 1: Checking if Vertex AI is enabled...".blue().bold()
@@ -190,14 +190,14 @@ fn ensure_vertex_ai_project() -> Result<(), std::io::Error> {
 /// of VertexAIModel structs.
 ///
 /// # Returns
-/// 
+///
 /// * `Result<Vec<VertexAIModel>, std::io::Error>` - List of Vertex AI models or error
-/// 
+///
 /// # Example
-/// 
+///
 /// ```rust
 /// use hvertex::list_vertex_ai_models;
-/// 
+///
 /// let project_id = "my-project-id";
 /// let region = "us-central1";
 /// let models = list_vertex_ai_models(project_id, region)?;
@@ -269,18 +269,18 @@ fn list_vertex_ai_models() -> Result<Vec<VertexAIModel>> {
 /// login command and automatically sets up environment variables.
 ///
 /// # Returns
-/// 
-/// * `Result<(), std::io::Error>` - Success or error status
-/// 
+///
+/// * `Result<(), anyhow::Error>` - Success or error status
+///
 /// # Example
-/// 
+///
 /// ```rust
 /// use hvertex::setup_authentication;
-/// 
+///
 /// let project_id = "my-project-id";
 /// setup_authentication(project_id)?;
 /// ```
-fn setup_authentication() -> Result<(), std::io::Error> {
+fn setup_authentication() -> Result<(), anyhow::Error> {
     println!("\n{}", "Step 3: Setting up authentication...".blue().bold());
     println!("For Vertex AI API access, we will use Application Default Credentials (ADC)");
 
@@ -383,14 +383,14 @@ fn get_project_id() -> Result<String> {
 /// generate text using the Gemini Pro 2 model with Google Search grounding.
 ///
 /// # Returns
-/// 
+///
 /// * `Result<(), std::io::Error>` - Success or error status
-/// 
+///
 /// # Example
-/// 
+///
 /// ```rust
 /// use hvertex::test_vertex_ai_api_call;
-/// 
+///
 /// let project_id = "my-project-id";
 /// let model = "gemini-pro";
 /// test_vertex_ai_api_call(project_id, model)?;
