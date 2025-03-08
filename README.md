@@ -135,3 +135,19 @@ If you find this tool useful, please consider [sponsoring me on GitHub](https://
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 📝 Release Notes
+
+### v0.1.1 (2024-03-21)
+* 🎨 Enhanced terminal interface with improved ASCII art and animations
+* 🔧 Added support for Gemini Pro 2 model testing
+* 📚 Improved documentation and usage instructions
+* 🐛 Fixed environment variable handling
+* 🔑 Streamlined authentication setup process
+
+### v0.1.0 (2024-03-20)
+* 🚀 Initial release
+* ✨ Basic Vertex AI service setup and configuration
+* 🔍 Model discovery functionality
+* 🔑 Authentication management
+* 📊 Environment variable configuration
