@@ -18,10 +18,10 @@ A powerful command-line tool for setting up and testing Google Cloud Vertex AI i
 
 Before using this tool, ensure you have:
 
-1. Rust and Cargo installed
-2. Google Cloud SDK (gcloud CLI) installed and configured
-3. Active Google Cloud project with billing enabled
-4. Appropriate IAM permissions (e.g., `roles/aiplatform.user`)
+1. [Rust and Cargo](https://www.rust-lang.org/tools/install) installed
+2. [Google Cloud SDK (gcloud CLI)](https://cloud.google.com/sdk/docs/install) installed and configured
+3. [Active Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) with [billing enabled](https://cloud.google.com/billing/docs/how-to/modify-project)
+4. [Appropriate IAM permissions](https://cloud.google.com/vertex-ai/docs/general/access-control) (e.g., `roles/aiplatform.user`)
 
 ## 📦 Installation
 
