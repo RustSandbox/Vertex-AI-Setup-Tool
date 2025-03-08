@@ -1,6 +1,8 @@
 # 🚀 Vertex AI Setup Tool
 
-A Rust command-line utility that automates Google Cloud Vertex AI setup and testing with a rich, interactive terminal interface.
+A powerful command-line tool for setting up and testing Google Cloud Vertex AI integration. This tool automates the process of enabling Vertex AI services, managing authentication, and testing API calls.
+
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor%20on%20GitHub-%23EA4AAA?style=for-the-badge&logo=github&logoColor=white)](https://github.com/sponsors/hghalebi)
 
 ## ✨ Features
 
