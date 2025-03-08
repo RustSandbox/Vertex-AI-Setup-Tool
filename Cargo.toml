@@ -1,8 +1,8 @@
 [package]
 name = "hvertex"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
-authors = ["Hamze Ghalebi <hamze@remolab.com>"]
+authors = ["Hamze Ghalebi <ghalebi@gmail.com>"]
 description = "A powerful command-line tool for setting up and testing Google Cloud Vertex AI integration"
 license = "MIT"
 repository = "https://github.com/RustSandbox/Vertex-AI-Setup-Tool"
