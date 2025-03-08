@@ -130,7 +130,7 @@ Many of the tools I create solve specific pain points in my daily workflow with 
 
 ### Support this project:
 
-If you find this tool useful, please consider sponsoring me on GitHub to support continued development and maintenance.
+If you find this tool useful, please consider [sponsoring me on GitHub](https://github.com/sponsors/hghalebi) to support continued development and maintenance.
 
 ## 📄 License
 
