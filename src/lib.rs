@@ -53,11 +53,18 @@
 //!
 //! This project is licensed under the MIT License.
 
-pub mod config;
+pub mod auth;
+pub mod models;
+pub mod pdf;
+pub mod setup;
 pub mod vertex_ai;
 
-pub use config::Config;
-pub use vertex_ai::*;
+// Re-export commonly used items
+pub use auth::{get_access_token, setup_authentication};
+pub use models::list_vertex_ai_models;
+pub use pdf::extract_data_from_pdf_v2;
+pub use setup::{ensure_vertex_ai_service, test_vertex_ai_api_call};
+pub use vertex_ai::VertexAIRequest;
 
 /// Re-export anyhow::Result for convenience
 pub use anyhow::Result;

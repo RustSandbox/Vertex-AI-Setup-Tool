@@ -1,0 +1,474 @@
+{
+  "adhesion_details": {
+    "collective_contract_number": {
+      "accuracy_score": 0.98,
+      "value": "5358"
+    },
+    "contribution_calculation_basis": {
+      "accuracy_score": 0.9,
+      "value": "Capital restant dû"
+    },
+    "duration": {
+      "accuracy_score": 0.9,
+      "value": "20 ans 24 jours"
+    },
+    "effective_date": {
+      "accuracy_score": 0.95,
+      "value": "6 septembre 2018"
+    },
+    "funds_release_date": {
+      "accuracy_score": 0.95,
+      "value": "28 septembre 2018"
+    },
+    "loan_amount": {
+      "accuracy_score": 0.98,
+      "value": "620.000,00 €"
+    },
+    "loan_duration": {
+      "accuracy_score": 0.9,
+      "value": "20 ans"
+    },
+    "notice_information_reference": {
+      "accuracy_score": 0.95,
+      "value": "DPP 18-001"
+    },
+    "total_insurance_cost": {
+      "accuracy_score": 0.98,
+      "value": "12.171,72 €"
+    }
+  },
+  "beneficiaries": {
+    "after_funds_release": "l'organisme prêteur dans la limite des sommes restant dues par l'adhérent. Le bénéficiaire du solde éventuel sera :en cas de décès: le conjoint de l'assuré(e) non séparé de corps, à défaut les enfants nés ou à naître de l'assuré(e) par parts égales entre eux, celle du prédécédé revenant à ses descendants, à défaut de descendants, aux survivants desdits enfants, à défaut les héritiers de l'assuré(e). pour les autres garanties: l'assuré",
+    "before_funds_release": "Pour la garantie immédiate décès par accident (si cette garantie est prévue dans la Notice d'Information) ou l'option couverture décès avant la date de déblocage des fonds: le conjoint de l'assuré(e) non séparé de corps, à défaut les enfants nés ou à naître de l'assuré(e) par parts égales entre eux, celle du prédécédé revenant à ses descendants, à défaut de descendants, aux survivants desdits enfants, à défaut les héritiers de l'assuré(e)"
+  },
+  "clause_particuliere": {
+    "accuracy_score": 0.8,
+    "value": "Le prêt figurant dans l'échéancier de cotisations annexé au présent certificat d'adhésion a été contracté par l'adhérent et avec un co-emprunteur, co-emprunteur. Ce co-emprunteur est également assuré au titre du même contrat groupe par une adhésion distincte."
+  },
+  "company_signatory": {
+    "accuracy_score": 0.9,
+    "designation": "Directeur des centres de solutions client",
+    "name": "Patrick GAGNAIRE"
+  },
+  "contract_details": {
+    "adhesion_type": "Adhésion facultative",
+    "association_details": "Association Nationale pour la Couverture des risques, la Retraite et l'Epargne\nAssociation régie par la Loi du 1er juillet 1901\n48, rue de Provence, 75009 Paris",
+    "association_name": {
+      "accuracy_score": 0.95,
+      "value": "ANCRE"
+    },
+    "contract_reference": {
+      "accuracy_score": 0.99,
+      "value": "0.062.967.625 AG"
+    },
+    "number": {
+      "accuracy_score": 0.98,
+      "value": "5358"
+    },
+    "type": "Contrat d'assurance de groupe"
+  },
+  "date": {
+    "accuracy_score": 0.95,
+    "value": "6 septembre 2018"
+  },
+  "document_type": {
+    "accuracy_score": 0.95,
+    "value": "Certificat d'adhésion"
+  },
+  "guarantees": {
+    "death_guarantee": {
+      "effective_date": {
+        "accuracy_score": 0.95,
+        "value": "28 septembre 2018"
+      },
+      "insured_share": {
+        "accuracy_score": 0.95,
+        "value": "60,00%"
+      }
+    },
+    "dreaded_diseases_option": {
+      "effective_date": {
+        "accuracy_score": 0.95,
+        "value": "28 septembre 2018"
+      },
+      "insured_share": {
+        "accuracy_score": 0.95,
+        "value": "60,00 %"
+      }
+    },
+    "partial_permanent_disability_guarantee": {
+      "effective_date": {
+        "accuracy_score": 0.95,
+        "value": "28 septembre 2018"
+      },
+      "insured_share": {
+        "accuracy_score": 0.95,
+        "value": "60,00%"
+      }
+    },
+    "partial_temporary_disability_guarantee": {
+      "effective_date": {
+        "accuracy_score": 0.95,
+        "value": "28 septembre 2018"
+      },
+      "insured_share": {
+        "accuracy_score": 0.95,
+        "value": "60,00 %"
+      },
+      "waiting_period": {
+        "accuracy_score": 0.9,
+        "value": "90 jours"
+      }
+    },
+    "temporary_total_disability_guarantee": {
+      "effective_date": {
+        "accuracy_score": 0.95,
+        "value": "28 septembre 2018"
+      },
+      "insured_share": {
+        "accuracy_score": 0.95,
+        "value": "60,00 %"
+      },
+      "waiting_period": {
+        "accuracy_score": 0.9,
+        "value": "90 jours"
+      }
+    },
+    "total_and_irreversible_autonomy_loss_guarantee": {
+      "effective_date": {
+        "accuracy_score": 0.95,
+        "value": "28 septembre 2018"
+      },
+      "insured_share": {
+        "accuracy_score": 0.95,
+        "value": "60,00%"
+      }
+    },
+    "total_permanent_disability_guarantee": {
+      "effective_date": {
+        "accuracy_score": 0.95,
+        "value": "28 septembre 2018"
+      },
+      "insured_share": {
+        "accuracy_score": 0.95,
+        "value": "60,00 %"
+      }
+    }
+  },
+  "payment_schedule": {
+    "annual_effective_rate": {
+      "accuracy_score": 0.95,
+      "value": "0,19%"
+    },
+    "payments": [
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "372.000,00 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2018"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "64,92 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "355.113,10 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2019"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "72,98 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "338.056,55 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2020"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "78,17 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "320.828,64 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2021"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "81,86 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "303.427,67 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2022"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "82,92 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "285.851,89 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2023"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "82,82 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "268.099,55 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2024"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "81,33 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "250.168,86 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2025"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "78,85 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "232.058,04 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2026"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "73,35 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "213.765,28 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2027"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "66,36 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "195.288,75 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2028"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "58,50 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "176.626,60 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2029"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "48,79 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "157.776,98 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2030"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "40,17 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "138.738,01 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2031"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "32,22 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "119.507,77 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2032"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "24,71 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "100.084,34 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2033"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "18,32 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "80.465,78 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2034"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "13,13 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "60.650,13 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2035"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "8,65 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "40.635,41 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2036"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "4,53 €"
+        }
+      },
+      {
+        "capital_insured_in_case_of_death": {
+          "accuracy_score": 0.98,
+          "value": "20.419,63 €"
+        },
+        "date": {
+          "accuracy_score": 0.95,
+          "value": "28.09.2037"
+        },
+        "monthly_premium_ttc": {
+          "accuracy_score": 0.98,
+          "value": "1,73 €"
+        }
+      }
+    ],
+    "total_amount_ttc": {
+      "accuracy_score": 0.98,
+      "value": "12. 171,72 €"
+    }
+  },
+  "personal_information": {
+    "general_agent": {
+      "accuracy_score": 0.85,
+      "value": "OFFRES SALARIES ALLIANZ CASE COURRIER K911 13-27 ESP CHARLES DE GAULLE 92076 PARIS LA DEFENSE CEDEX"
+    },
+    "insured": {
+      "accuracy_score": 0.95,
+      "address": "34 RUE DU DOCTEUR ROCHEFORT\n78400 CHATOU",
+      "date_of_birth": {
+        "accuracy_score": 0.95,
+        "value": "19 mars 1976"
+      },
+      "name": "M YANNICK RAYNARD"
+    },
+    "policy_number": {
+      "accuracy_score": 0.95,
+      "value": "9556467"
+    },
+    "subscriber": {
+      "accuracy_score": 0.95,
+      "address": "34 RUE DU DOCTEUR ROCHEFORT\n78400 CHATOU",
+      "name": "M YANNICK RAYNARD"
+    }
+  }
+}
