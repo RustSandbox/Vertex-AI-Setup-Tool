@@ -32,7 +32,10 @@
 //! This project is licensed under the MIT License.
 
 use anyhow::{Context, Result};
+use base64::engine::general_purpose;
+use base64::Engine;
 use colored::Colorize;
+use regex::Regex;
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
 use serde::Deserialize;
 use serde_json::{json, Value};
@@ -97,22 +100,71 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     load_environment()?;
 
     // Step 1: Ensure Vertex AI is enabled for the project
-    ensure_vertex_ai_project()?;
+    //ensure_vertex_ai_project()?;
 
     // Step 2: List Vertex AI models
-    let _models = list_vertex_ai_models()?;
+    //let _models = list_vertex_ai_models()?;
 
     // Step 3: Setup authentication for API access
-    setup_authentication()?;
+    //setup_authentication()?;
 
     // Step 4: Check environment variables
-    check_environment_variables()?;
+    //check_environment_variables()?;
 
     // Step 5: Test the Vertex AI API with a simple text generation request
-    test_vertex_ai_api_call()?;
+    //test_vertex_ai_api_call()?;
 
     // Step 6: Print instructions for using the authentication in the future
-    print_authentication_instructions();
+    //print_authentication_instructions();
+    let pdf_path = "/Users/hamzeghalebi/project/remolab/giva/pdfproject/data/103/2_707_VIE0062967625W4LC011GCOMM____2018-09-06-13.44.44.3900001.pdf";
+    let pdf_bytes = std::fs::read(pdf_path).expect("Failed to read PDF file");
+    let pdf_base64 = general_purpose::STANDARD.encode(pdf_bytes);
+
+    // Extract data from the PDF
+    let api_response = extract_data_from_pdf(&pdf_base64, None, None, None)?;
+
+    // Process the response
+    println!("Raw API response received. Processing...");
+
+    // Check if we need to extract JSON from raw text
+    if let Some(raw_text) = api_response.get("raw_text").and_then(|v| v.as_str()) {
+        println!("Detected raw text response. Extracting JSON data...");
+
+        // Extract the JSON from the raw text
+        match extract_json_from_raw_text(raw_text) {
+            Ok(extracted_json) => {
+                println!("Successfully extracted JSON data!");
+                println!("Extracted data sample:");
+
+                // Print a sample of the extracted data
+                if let Some(doc_type) = extracted_json.get("document_type").and_then(|v| v.as_str())
+                {
+                    println!("Document Type: {}", doc_type.cyan());
+                }
+
+                if let Some(contract_num) = extracted_json
+                    .get("contract_number")
+                    .and_then(|v| v.as_str())
+                {
+                    println!("Contract Number: {}", contract_num.cyan());
+                }
+
+                // Write the pretty-printed JSON to a file for inspection
+                let json_str = serde_json::to_string_pretty(&extracted_json)?;
+                let output_path = "extracted_data.json";
+                std::fs::write(output_path, json_str)?;
+                println!("Full extracted data written to: {}", output_path.cyan());
+            }
+            Err(e) => {
+                println!("Error extracting JSON: {}", e);
+                println!("Raw text: {}", raw_text);
+            }
+        }
+    } else {
+        // The response is already in JSON format
+        println!("API response is already in JSON format:");
+        println!("{:#?}", api_response);
+    }
 
     Ok(())
 }
@@ -563,7 +615,7 @@ fn print_authentication_instructions() {
     );
     println!("In shell scripts:");
     println!(
-        "  {}",
+        "{}",
         "ACCESS_TOKEN=$(gcloud auth print-access-token)".cyan()
     );
 
@@ -658,4 +710,423 @@ fn run_command(command: &mut Command, verbose: bool) -> Result<Output> {
     }
 
     Ok(output)
+}
+
+/// Extracts structured data from a PDF file using Vertex AI's Gemini 2.0 Flash model
+///
+/// This function takes a base64-encoded PDF file and sends it to the Vertex AI API
+/// with specific instructions to extract data in JSON format with meaningful keys and accuracy scores.
+/// The function handles separating different types of information like company and individual addresses.
+///
+/// # Arguments
+///
+/// * `pdf_base64` - A string slice containing the base64-encoded PDF data
+/// * `project_id` - Optional project ID (defaults to environment variable if not provided)
+/// * `location_id` - Optional location ID (defaults to "us-central1" if not provided)
+/// * `model_id` - Optional model ID (defaults to "gemini-2.0-flash-exp" if not provided)
+///
+/// # Returns
+///
+/// * `Result<serde_json::Value, anyhow::Error>` - The extracted data as a JSON value or an error
+///
+/// # Example
+///
+/// ```rust
+/// use std::fs::read;
+/// use base64::{engine::general_purpose, Engine};
+///
+/// // Read a PDF file and encode it as base64
+/// let pdf_bytes = read("document.pdf").expect("Failed to read PDF file");
+/// let pdf_base64 = general_purpose::STANDARD.encode(pdf_bytes);
+///
+/// // Extract data from the PDF
+/// let extracted_data = extract_data_from_pdf(&pdf_base64, None, None, None)?;
+/// println!("{}", serde_json::to_string_pretty(&extracted_data)?);
+/// ```
+pub fn extract_data_from_pdf(
+    pdf_base64: &str,
+    project_id: Option<String>,
+    location_id: Option<&str>,
+    model_id: Option<&str>,
+) -> Result<serde_json::Value> {
+    // Get the project ID, location ID, and model ID with default values
+    let project_id = match project_id {
+        Some(id) => id,
+        None => env::var("VERTEX_AI_PROJECT_ID")
+            .context("Project ID not provided and VERTEX_AI_PROJECT_ID not set")?,
+    };
+    let location_id = location_id.unwrap_or("us-central1");
+    let model_id = model_id.unwrap_or("gemini-2.0-flash-exp");
+    let api_endpoint = format!("{}-aiplatform.googleapis.com", location_id);
+
+    println!("Extracting data from PDF using Vertex AI {}...", model_id);
+
+    // Get access token for API authentication
+    let access_token = get_access_token()?;
+
+    // Set up the HTTP client
+    let client = reqwest::blocking::Client::new();
+
+    // Construct the API URL
+    let api_url = format!(
+        "https://{}/v1/projects/{}/locations/{}/publishers/google/models/{}:generateContent",
+        api_endpoint, project_id, location_id, model_id
+    );
+
+    // Set up request headers
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        AUTHORIZATION,
+        HeaderValue::from_str(&format!("Bearer {}", access_token))
+            .context("Failed to create authorization header")?,
+    );
+    headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+
+    // Create the request body
+    let request_body = json!({
+        "contents": [
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "inlineData": {
+                            "mimeType": "application/pdf",
+                            "data": pdf_base64
+                        }
+                    },
+                    {
+                        "text": "read this file give all data in josn format. you need to be smart key mininingfull choise and a fild for acuracy score . in and contacrt there diifrent information related to girent people like adress of company or adresss of indidual who signe contarct. those need to be seperated."
+                    }
+                ]
+            }
+        ],
+        "systemInstruction": {
+            "parts": [
+                {
+                    "text": "You are a data extractor specializing in insurance-related documents. You are an expert at extracting all data which can be extracted from any PDF, including data accessible through Optical Character Recognition (OCR)."
+                }
+            ]
+        },
+        "generationConfig": {
+            "responseModalities": ["TEXT"],
+            "temperature": 2,
+            "maxOutputTokens": 8192,
+            "topP": 0.95
+        },
+        "safetySettings": [
+            {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "OFF"
+            },
+            {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "OFF"
+            },
+            {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "OFF"
+            },
+            {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "OFF"
+            }
+        ],
+        "tools": [
+            {
+                "googleSearch": {}
+            }
+        ]
+    });
+
+    // Make the API request
+    let response = client
+        .post(api_url)
+        .headers(headers)
+        .json(&request_body)
+        .send()
+        .context("Failed to make Vertex AI API request")?;
+
+    // Check if the request was successful
+    let status = response.status();
+    if !status.is_success() {
+        // If the request failed, return the error
+        let error_text = response
+            .text()
+            .unwrap_or_else(|_| "Unable to get error details".to_string());
+        return Err(anyhow::anyhow!(
+            "API request failed with status code {}: {}",
+            status,
+            error_text
+        ));
+    }
+
+    // Parse the response
+    let response_json: Value = response
+        .json()
+        .context("Failed to parse API response as JSON")?;
+
+    // Extract the generated text and parse it as JSON
+    if let Some(candidates) = response_json["candidates"].as_array() {
+        if let Some(content) = candidates
+            .first()
+            .and_then(|c| c["content"]["parts"].as_array())
+            .and_then(|parts| parts.first())
+            .and_then(|p| p["text"].as_str())
+        {
+            // Try to parse the response text as JSON
+            match serde_json::from_str::<Value>(content) {
+                Ok(json_data) => {
+                    return Ok(json_data);
+                }
+                Err(e) => {
+                    // If parsing as JSON fails, return the raw text as a JSON string
+                    println!(
+                        "Warning: Could not parse response as JSON ({}). Returning raw text.",
+                        e
+                    );
+                    return Ok(json!({ "raw_text": content }));
+                }
+            }
+        }
+    }
+
+    // If we couldn't extract the response, return an error
+    Err(anyhow::anyhow!(
+        "Failed to extract data from the API response"
+    ))
+}
+
+/// Creates a streaming version of the PDF data extraction function
+///
+/// This function is similar to `extract_data_from_pdf` but streams the response
+/// directly to the provided writer instead of returning a JSON value.
+///
+/// # Arguments
+///
+/// * `pdf_base64` - A string slice containing the base64-encoded PDF data
+/// * `writer` - A writer implementing `std::io::Write` to stream the response to
+/// * `project_id` - Optional project ID (defaults to environment variable if not provided)
+/// * `location_id` - Optional location ID (defaults to "us-central1" if not provided)
+/// * `model_id` - Optional model ID (defaults to "gemini-2.0-flash-exp" if not provided)
+///
+/// # Returns
+///
+/// * `Result<(), anyhow::Error>` - Success or error status
+///
+/// # Example
+///
+/// ```rust
+/// use std::fs::{read, File};
+/// use std::io::stdout;
+/// use base64::{engine::general_purpose, Engine};
+///
+/// // Read a PDF file and encode it as base64
+/// let pdf_bytes = read("document.pdf").expect("Failed to read PDF file");
+/// let pdf_base64 = general_purpose::STANDARD.encode(pdf_bytes);
+///
+/// // Stream the extracted data to stdout
+/// extract_data_from_pdf_stream(&pdf_base64, &mut stdout(), None, None, None)?;
+/// ```
+pub fn extract_data_from_pdf_stream<W: Write>(
+    pdf_base64: &str,
+    writer: &mut W,
+    project_id: Option<String>,
+    location_id: Option<&str>,
+    model_id: Option<&str>,
+) -> Result<()> {
+    // Get the project ID, location ID, and model ID with default values
+    let project_id = match project_id {
+        Some(id) => id,
+        None => env::var("VERTEX_AI_PROJECT_ID")
+            .context("Project ID not provided and VERTEX_AI_PROJECT_ID not set")?,
+    };
+    let location_id = location_id.unwrap_or("us-central1");
+    let model_id = model_id.unwrap_or("gemini-2.0-flash-exp");
+    let api_endpoint = format!("{}-aiplatform.googleapis.com", location_id);
+
+    println!(
+        "Streaming data extraction from PDF using Vertex AI {}...",
+        model_id
+    );
+
+    // Get access token for API authentication
+    let access_token = get_access_token()?;
+
+    // Set up the HTTP client
+    let client = reqwest::blocking::Client::new();
+
+    // Construct the API URL with streamGenerateContent
+    let api_url = format!(
+        "https://{}/v1/projects/{}/locations/{}/publishers/google/models/{}:streamGenerateContent",
+        api_endpoint, project_id, location_id, model_id
+    );
+
+    // Set up request headers
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        AUTHORIZATION,
+        HeaderValue::from_str(&format!("Bearer {}", access_token))
+            .context("Failed to create authorization header")?,
+    );
+    headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+
+    // Create the request body
+    let request_body = json!({
+        "contents": [
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "inlineData": {
+                            "mimeType": "application/pdf",
+                            "data": pdf_base64
+                        }
+                    },
+                    {
+                        "text": "read this file give all data in josn format. you need to be smart key mininingfull choise and a fild for acuracy score . in and contacrt there diifrent information related to girent people like adress of company or adresss of indidual who signe contarct. those need to be seperated."
+                    }
+                ]
+            }
+        ],
+        "systemInstruction": {
+            "parts": [
+                {
+                    "text": "You are a data extractor specializing in insurance-related documents. You are an expert at extracting all data which can be extracted from any PDF, including data accessible through Optical Character Recognition (OCR)."
+                }
+            ]
+        },
+        "generationConfig": {
+            "responseModalities": ["TEXT"],
+            "temperature": 2,
+            "maxOutputTokens": 8192,
+            "topP": 0.95
+        },
+        "safetySettings": [
+            {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "OFF"
+            },
+            {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "OFF"
+            },
+            {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "OFF"
+            },
+            {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "OFF"
+            }
+        ],
+        "tools": [
+            {
+                "googleSearch": {}
+            }
+        ]
+    });
+
+    // Make the API request
+    let response = client
+        .post(api_url)
+        .headers(headers)
+        .json(&request_body)
+        .send()
+        .context("Failed to make Vertex AI API request")?;
+
+    // Check if the request was successful
+    let status = response.status();
+    if !status.is_success() {
+        // If the request failed, return the error
+        let error_text = response
+            .text()
+            .unwrap_or_else(|_| "Unable to get error details".to_string());
+        return Err(anyhow::anyhow!(
+            "API request failed with status code {}: {}",
+            status,
+            error_text
+        ));
+    }
+
+    // Process and stream the response
+    let response_text = response.text().context("Failed to get response text")?;
+
+    // The streaming response is a series of JSON objects separated by newlines
+    for line in response_text.lines() {
+        if line.is_empty() {
+            continue;
+        }
+
+        // Parse each line as JSON
+        let chunk: Value = serde_json::from_str(line).context("Failed to parse response chunk")?;
+
+        // Extract text content from the chunk
+        if let Some(candidates) = chunk["candidates"].as_array() {
+            if let Some(content) = candidates
+                .first()
+                .and_then(|c| c["content"]["parts"].as_array())
+                .and_then(|parts| parts.first())
+                .and_then(|p| p["text"].as_str())
+            {
+                // Write the text content to the provided writer
+                write!(writer, "{}", content).context("Failed to write response chunk")?;
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Extracts and parses JSON data from raw text that contains Markdown code blocks
+///
+/// This function is designed to handle responses from the Vertex AI API that
+/// may return JSON data wrapped in Markdown code blocks (```json ... ```).
+/// It will extract the JSON content and parse it into a proper serde_json::Value.
+///
+/// # Arguments
+///
+/// * `raw_text` - A string slice containing the raw text with potential JSON data in code blocks
+///
+/// # Returns
+///
+/// * `Result<serde_json::Value, anyhow::Error>` - The parsed JSON value or an error
+///
+/// # Example
+///
+/// ```rust
+/// let response = extract_data_from_pdf(&pdf_base64, None, None, None)?;
+///
+/// // If the response contains raw_text with JSON in backticks
+/// if let Some(raw_text) = response.get("raw_text") {
+///     if let Some(text) = raw_text.as_str() {
+///         let parsed_json = extract_json_from_raw_text(text)?;
+///         println!("{}", serde_json::to_string_pretty(&parsed_json)?);
+///     }
+/// }
+/// ```
+pub fn extract_json_from_raw_text(raw_text: &str) -> Result<Value> {
+    // First, check if the input is a JSON object with a "raw_text" field
+    if let Ok(parsed) = serde_json::from_str::<Value>(raw_text) {
+        if let Some(inner_text) = parsed.get("raw_text").and_then(|v| v.as_str()) {
+            // If we have a "raw_text" field, use its value as our raw text
+            return extract_json_from_raw_text(inner_text);
+        }
+    }
+
+    // Create a regex to match JSON content within triple backticks
+    // The (?s) modifier enables "dot matches newline" mode
+    let re = Regex::new(r"```(?:json)?\s*([\s\S]*?)\s*```").context("Failed to compile regex")?;
+
+    // Try to find a match
+    if let Some(captures) = re.captures(raw_text) {
+        if let Some(json_str) = captures.get(1) {
+            // Parse the extracted JSON string
+            return serde_json::from_str::<Value>(json_str.as_str())
+                .context("Failed to parse extracted JSON");
+        }
+    }
+
+    // If no code blocks were found, try to parse the entire text as JSON
+    serde_json::from_str::<Value>(raw_text)
+        .context("Failed to parse text as JSON and no code blocks were found")
 }

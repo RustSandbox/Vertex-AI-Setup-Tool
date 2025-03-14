@@ -1,0 +1,156 @@
+{
+  "accuracyScore": 95,
+  "adhesionDetails": {
+    "contributionBasis": "Capital restant dû",
+    "duration": "20 ans 24 jours",
+    "effectiveDate": "6 septembre 2018",
+    "fundReleaseDate": "28 septembre 2018",
+    "loanAmount": "620.000,00 €",
+    "loanDuration": "20 ans",
+    "totalInsuranceCost": "12.171,72 €"
+  },
+  "annualEffectiveRate": "0,19%",
+  "associationDetails": "Association Nationale pour la Couverture des risques, la Retraite et l'Epargne Association régie par la Loi du 1er juillet 1901 48, rue de Provence, 75009 Paris",
+  "associationName": "ANCRE",
+  "beneficiaries": {
+    "afterFundRelease": {
+      "primaryBeneficiary": "l'organisme prêteur dans la limite des sommes restant dues par l'adhérent",
+      "secondaryBeneficiary": "en cas de décès: le conjoint de l'assuré(e) non séparé de corps, à défaut les enfants nés ou à naître de l'assuré(e) par parts égales entre eux, celle du prédécédé revenant à ses descendants, à défaut de descendants, aux survivants desdits enfants, à défaut les héritiers de l'assuré(e)"
+    },
+    "beforeFundRelease": {
+      "beneficiary": "le conjoint de l'assuré(e) non séparé de corps, à défaut les enfants nés ou à naître de l'assuré(e) par parts égales entre eux, celle du prédécédé revenant à ses descendants, à défaut de descendants, aux survivants desdits enfants, à défaut les héritiers de l'assuré(e)"
+    }
+  },
+  "collectiveAgreementNumber": "5358",
+  "contractNumber": "5358",
+  "contractType": "CONTRAT D'ASSURANCE DE GROUPE",
+  "contributionSchedule": {
+    "dueDate": [
+      "28.09.2018",
+      "28.09.2019",
+      "28.09.2020",
+      "28.09.2021",
+      "28.09.2022",
+      "28.09.2023",
+      "28.09.2024",
+      "28.09.2025",
+      "28.09.2026",
+      "28.09.2027",
+      "28.09.2028",
+      "28.09.2029",
+      "28.09.2030",
+      "28.09.2031",
+      "28.09.2032",
+      "28.09.2033",
+      "28.09.2034",
+      "28.09.2035",
+      "28.09.2036",
+      "28.09.2037"
+    ],
+    "insuredCapital": [
+      "372.000,00 €",
+      "355.113,10 €",
+      "338.056,55 €",
+      "320.828,64 €",
+      "303.427,67 €",
+      "285.851,89 €",
+      "268.099,55 €",
+      "250.168,86 €",
+      "232.058,04 €",
+      "213.765,28 €",
+      "195.288,75 €",
+      "176.626,60 €",
+      "157.776,98 €",
+      "138.738,01 €",
+      "119.507,77 €",
+      "100.084,34 €",
+      "80.465,78 €",
+      "60.650,13 €",
+      "40.635,41 €",
+      "20.419,63 €"
+    ],
+    "monthlyContribution": [
+      "64,92 €",
+      "72,98 €",
+      "78,17 €",
+      "81,86 €",
+      "82,92 €",
+      "82,82 €",
+      "81,33 €",
+      "78,85 €",
+      "73,35 €",
+      "66,36 €",
+      "58,50 €",
+      "48,79 €",
+      "40,17 €",
+      "32,22 €",
+      "24,71 €",
+      "18,32 €",
+      "13,13 €",
+      "8,65 €",
+      "4,53 €",
+      "1,73 €"
+    ]
+  },
+  "contributions": {
+    "firstPayment": "Aucune cotisation due à l'adhésion.",
+    "paymentMethod": "prélèvement automatique au début de chaque mois"
+  },
+  "documentReference": "0.062.967.625 AG",
+  "documentType": "CERTIFICAT D'ADHÉSION",
+  "electronicMailService": "Grâce à l'adresse email ou au numéro de téléphone que vous nous avez indiqué, vous bénéficiez automatiquement de notre service e-courrier dont les modalités sont précisées dans la notice d'information. Vous acceptez ainsi que nos services ou votre conseiller utilisent cette adresse ou ce numéro de téléphone pour vous communiquer nos courriers de gestion ou les différentes informations liées à votre adhésion. Vous pouvez à tout moment renoncer à ce service selon les conditions expliquées dans la notice d'information.",
+  "generalAgent": "OFFRES SALARIES ALLIANZ CASE COURRIER K911 13-27 ESP CHARLES DE GAULLE 92076 PARIS LA DEFENSE CEDEX",
+  "guarantees": {
+    "deathGuarantee": {
+      "effectiveDate": "28 septembre 2018",
+      "insuredShare": "60,00%"
+    },
+    "partialPermanentDisabilityGuarantee": {
+      "effectiveDate": "28 septembre 2018",
+      "insuredShare": "60,00%"
+    },
+    "seriousIllnessOption": {
+      "effectiveDate": "28 septembre 2018",
+      "insuredShare": "60,00 %"
+    },
+    "temporaryPartialDisabilityGuarantee": {
+      "effectiveDate": "28 septembre 2018",
+      "insuredShare": "60,00 %",
+      "waitingPeriod": "90 jours"
+    },
+    "temporaryTotalDisabilityGuarantee": {
+      "effectiveDate": "28 septembre 2018",
+      "insuredShare": "60,00 %",
+      "waitingPeriod": "90 jours"
+    },
+    "totalAndIrreversibleLossOfAutonomyGuarantee": {
+      "effectiveDate": "28 septembre 2018",
+      "insuredShare": "60,00%"
+    },
+    "totalPermanentDisabilityGuarantee": {
+      "effectiveDate": "28 septembre 2018",
+      "insuredShare": "60,00 %"
+    }
+  },
+  "informationNoticeReference": "DPP 18-001",
+  "insuranceType": "Allianz Assurance Emprunteur",
+  "insured": {
+    "address": "34 RUE DU DOCTEUR ROCHEFORT 78400 CHATOU",
+    "birthDate": "19 mars 1976",
+    "name": "M YANNICK RAYNARD"
+  },
+  "memberNumber": "9556467",
+  "policyholder": {
+    "address": "34 RUE DU DOCTEUR ROCHEFORT 78400 CHATOU",
+    "name": "M YANNICK RAYNARD"
+  },
+  "signature": {
+    "date": "6 septembre 2018",
+    "location": "Strasbourg",
+    "name": "Patrick GAGNAIRE",
+    "title": "Directeur des centres de solutions client"
+  },
+  "smokingDeclaration": "Vous avez répondu que vous ne fumiez pas ou que vous aviez arrêté de fumer au moins 24 mois avant la date de signature de la demande d'adhésion ou de l'offre d'adhésion.",
+  "specialClause": "Le prêt figurant dans l'échéancier de cotisations annexé au présent certificat d'adhésion a été contracté par l'adhérent et avec un co-emprunteur, co-emprunteur. Ce co-emprunteur est également assuré au titre du même contrat groupe par une adhésion distincte.",
+  "totalAmountTTC": "12. 171,72 €"
+}
