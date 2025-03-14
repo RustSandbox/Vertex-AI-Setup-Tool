@@ -42,6 +42,7 @@ use base64::engine::general_purpose;
 use base64::Engine;
 use colored::Colorize;
 use futures::StreamExt;
+use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use regex::Regex;
 use serde_json::Value;
 use std::{
@@ -135,6 +136,7 @@ fn write_log_entry(log_dir: &Path, log: ExtractionLog) -> Result<()> {
 /// * `output_base_dir` - Base output directory for saving JSON files
 /// * `log_dir` - Base log directory for saving extraction logs
 /// * `request_queue` - Request queue for rate limiting
+/// * `progress_bar` - Progress bar for tracking progress
 ///
 /// # Returns
 ///
@@ -145,9 +147,18 @@ async fn process_single_pdf(
     output_base_dir: &Path,
     log_dir: &Path,
     request_queue: &RequestQueue,
+    progress_bar: ProgressBar,
 ) -> Result<()> {
-    println!("\n{}", "Processing PDF:".blue().bold());
-    println!("{}", path.display().to_string().cyan());
+    // Set the progress bar style
+    progress_bar.set_style(
+        ProgressStyle::default_bar()
+            .template("{spinner:.green} [{elapsed_precise}] {msg}")
+            .unwrap()
+            .progress_chars("#>-"),
+    );
+
+    // Update progress message with the current file
+    progress_bar.set_message(format!("Processing: {}", path.display()));
 
     // Read and encode the PDF file
     let pdf_bytes = fs::read(&path)?;
@@ -185,11 +196,11 @@ async fn process_single_pdf(
                     match extract_json_from_raw_text(raw_text) {
                         Ok(extracted_json) => extracted_json,
                         Err(e) => {
-                            println!(
-                                "Warning: Failed to extract JSON from raw text for {}: {}",
+                            progress_bar.set_message(format!(
+                                "Warning: Failed to extract JSON from {}: {}",
                                 path.display(),
                                 e
-                            );
+                            ));
                             api_response
                         }
                     }
@@ -202,21 +213,24 @@ async fn process_single_pdf(
             fs::write(&output_path, json_str)?;
 
             // Log successful extraction
-            let log = ExtractionLog::new(path_display, "SUCCESS".to_string(), None);
+            let log = ExtractionLog::new(path_display.clone(), "SUCCESS".to_string(), None);
             write_log_entry(log_dir, log)?;
 
-            println!(
-                "✅ Extracted data saved to: {}",
-                output_path.display().to_string().green()
-            );
+            // Update progress bar
+            progress_bar.finish_with_message(format!("✅ Completed: {}", path_display));
             Ok(())
         }
         Err(e) => {
             // Log the error
-            let log = ExtractionLog::new(path_display, "FAILED".to_string(), Some(e.to_string()));
+            let log = ExtractionLog::new(
+                path_display.clone(),
+                "FAILED".to_string(),
+                Some(e.to_string()),
+            );
             write_log_entry(log_dir, log)?;
 
-            println!("❌ Failed to process {}: {}", path.display(), e);
+            // Update progress bar with error
+            progress_bar.finish_with_message(format!("❌ Failed: {} - {}", path_display, e));
             Err(e)
         }
     }
@@ -292,20 +306,28 @@ async fn process_pdfs_recursively(
         MAX_CONCURRENT_TASKS.to_string().cyan()
     );
 
+    // Create multi-progress bar
+    let multi_progress = Arc::new(MultiProgress::new());
+
     // Process files in parallel with controlled concurrency
     let mut tasks = futures::stream::iter(pdf_files.into_iter().map(|pdf_path| {
         let request_queue = Arc::clone(&request_queue);
         let input_dir = Arc::new(input_dir.to_path_buf());
         let output_base_dir = Arc::new(output_base_dir.to_path_buf());
         let log_dir = Arc::new(log_dir.to_path_buf());
+        let multi_progress = Arc::clone(&multi_progress);
 
         async move {
+            // Create a new progress bar for this file
+            let progress_bar = multi_progress.add(ProgressBar::new(1));
+
             let result = process_single_pdf(
                 pdf_path.clone(),
                 &input_dir,
                 &output_base_dir,
                 &log_dir,
                 &request_queue,
+                progress_bar,
             )
             .await;
 
