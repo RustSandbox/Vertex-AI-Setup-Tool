@@ -7,7 +7,7 @@ use crate::auth;
 use crate::vertex_ai::VertexAIRequest;
 
 /// Modified extract_data_from_pdf function to use the new VertexAIRequest struct
-pub fn extract_data_from_pdf_v2(
+pub async fn extract_data_from_pdf_v2(
     pdf_base64: &str,
     prompt: Option<&str>,
     system_instruction: Option<&str>,
@@ -31,7 +31,7 @@ pub fn extract_data_from_pdf_v2(
     let access_token = auth::get_access_token()?;
 
     // Set up the HTTP client
-    let client = reqwest::blocking::Client::new();
+    let client = reqwest::Client::new();
 
     // Construct the API URL
     let api_url = format!(
@@ -61,6 +61,7 @@ pub fn extract_data_from_pdf_v2(
         .headers(headers)
         .json(&request)
         .send()
+        .await
         .context("Failed to make Vertex AI API request")?;
 
     // Check if the request was successful
@@ -69,6 +70,7 @@ pub fn extract_data_from_pdf_v2(
         // If the request failed, return the error
         let error_text = response
             .text()
+            .await
             .unwrap_or_else(|_| "Unable to get error details".to_string());
         return Err(anyhow::anyhow!(
             "API request failed with status code {}: {}",
@@ -80,6 +82,7 @@ pub fn extract_data_from_pdf_v2(
     // Parse the response
     let response_json: Value = response
         .json()
+        .await
         .context("Failed to parse API response as JSON")?;
 
     // Extract the generated text and parse it as JSON
