@@ -1,6 +1,7 @@
 mod auth;
 mod models;
 mod pdf;
+mod queue;
 mod setup;
 mod vertex_ai;
 
@@ -55,6 +56,7 @@ use tokio::{sync::Semaphore, time::sleep};
 use crate::auth::get_access_token;
 use crate::models::list_vertex_ai_models;
 use crate::pdf::extract_data_from_pdf_v2;
+use crate::queue::{QueueConfig, RequestQueue};
 use crate::setup::{ensure_vertex_ai_service, test_vertex_ai_api_call};
 
 /// Maximum number of retries for rate-limited requests
@@ -132,6 +134,7 @@ fn write_log_entry(log_dir: &Path, log: ExtractionLog) -> Result<()> {
 /// * `input_dir` - Base input directory for calculating relative paths
 /// * `output_base_dir` - Base output directory for saving JSON files
 /// * `log_dir` - Base log directory for saving extraction logs
+/// * `request_queue` - Request queue for rate limiting
 ///
 /// # Returns
 ///
@@ -141,6 +144,7 @@ async fn process_single_pdf(
     input_dir: &Path,
     output_base_dir: &Path,
     log_dir: &Path,
+    request_queue: &RequestQueue,
 ) -> Result<()> {
     println!("\n{}", "Processing PDF:".blue().bold());
     println!("{}", path.display().to_string().cyan());
@@ -154,112 +158,67 @@ async fn process_single_pdf(
     let output_dir = output_base_dir.join(relative_path);
     fs::create_dir_all(&output_dir)?;
 
-    // Generate output filename (replace .pdf with .json)
+    // Generate output filename
     let output_filename = path.file_stem().unwrap().to_string_lossy().to_string() + ".json";
     let output_path = output_dir.join(output_filename);
 
-    // Try to extract data with retries
-    let mut retry_count = 0;
-    let mut last_error = None;
+    // Clone values for the closure
+    let pdf_base64 = pdf_base64.clone();
+    let path_display = path.display().to_string();
 
-    while retry_count < MAX_RETRIES {
-        if retry_count > 0 {
-            // Calculate delay using exponential backoff
-            let delay = BASE_DELAY_MS * (2_u64.pow(retry_count - 1));
-            println!(
-                "Retrying after {} ms (attempt {}/{})",
-                delay,
-                retry_count + 1,
-                MAX_RETRIES
-            );
-            sleep(Duration::from_millis(delay)).await;
-        }
-
-        match extract_data_from_pdf_v2(
-            &pdf_base64,
-            None, // Use default prompt
-            None, // Use default system instruction
-            None, // Use default project ID
-            None, // Use default location
-            None, // Use default model
-        )
+    // Execute the request through the queue
+    match request_queue
+        .execute(move || {
+            // This closure will be retried automatically by the queue system
+            tokio::task::block_in_place(|| {
+                tokio::runtime::Handle::current().block_on(async {
+                    extract_data_from_pdf_v2(&pdf_base64, None, None, None, None, None).await
+                })
+            })
+        })
         .await
-        {
-            Ok(api_response) => {
-                // Process the response
-                let json_data =
-                    if let Some(raw_text) = api_response.get("raw_text").and_then(|v| v.as_str()) {
-                        match extract_json_from_raw_text(raw_text) {
-                            Ok(extracted_json) => extracted_json,
-                            Err(e) => {
-                                println!(
-                                    "Warning: Failed to extract JSON from raw text for {}: {}",
-                                    path.display(),
-                                    e
-                                );
-                                api_response
-                            }
+    {
+        Ok(api_response) => {
+            // Process the response
+            let json_data =
+                if let Some(raw_text) = api_response.get("raw_text").and_then(|v| v.as_str()) {
+                    match extract_json_from_raw_text(raw_text) {
+                        Ok(extracted_json) => extracted_json,
+                        Err(e) => {
+                            println!(
+                                "Warning: Failed to extract JSON from raw text for {}: {}",
+                                path.display(),
+                                e
+                            );
+                            api_response
                         }
-                    } else {
-                        api_response
-                    };
-
-                // Write the JSON to file
-                let json_str = serde_json::to_string_pretty(&json_data)?;
-                fs::write(&output_path, json_str)?;
-
-                // Log successful extraction
-                let log =
-                    ExtractionLog::new(path.display().to_string(), "SUCCESS".to_string(), None);
-                write_log_entry(log_dir, log)?;
-
-                println!(
-                    "✅ Extracted data saved to: {}",
-                    output_path.display().to_string().green()
-                );
-                return Ok(());
-            }
-            Err(e) => {
-                // Check if it's a rate limit error
-                if e.to_string().contains("429") {
-                    println!("Rate limit exceeded, retrying...");
-                    last_error = Some(e);
-                    retry_count += 1;
+                    }
                 } else {
-                    // Log non-rate-limit error immediately
-                    let log = ExtractionLog::new(
-                        path.display().to_string(),
-                        "FAILED".to_string(),
-                        Some(e.to_string()),
-                    );
-                    write_log_entry(log_dir, log)?;
+                    api_response
+                };
 
-                    // If it's not a rate limit error, return immediately
-                    println!("❌ Failed to process {}: {}", path.display(), e);
-                    return Err(e);
-                }
-            }
+            // Write the JSON to file
+            let json_str = serde_json::to_string_pretty(&json_data)?;
+            fs::write(&output_path, json_str)?;
+
+            // Log successful extraction
+            let log = ExtractionLog::new(path_display, "SUCCESS".to_string(), None);
+            write_log_entry(log_dir, log)?;
+
+            println!(
+                "✅ Extracted data saved to: {}",
+                output_path.display().to_string().green()
+            );
+            Ok(())
         }
-    }
+        Err(e) => {
+            // Log the error
+            let log = ExtractionLog::new(path_display, "FAILED".to_string(), Some(e.to_string()));
+            write_log_entry(log_dir, log)?;
 
-    // If we've exhausted all retries, log the failure
-    if let Some(e) = last_error {
-        let log = ExtractionLog::new(
-            path.display().to_string(),
-            "FAILED".to_string(),
-            Some(format!("Failed after {} retries: {}", MAX_RETRIES, e)),
-        );
-        write_log_entry(log_dir, log)?;
-
-        println!(
-            "❌ Failed to process {} after {} retries: {}",
-            path.display(),
-            MAX_RETRIES,
-            e
-        );
-        Err(e)
-    } else {
-        Ok(())
+            println!("❌ Failed to process {}: {}", path.display(), e);
+            Err(e)
+        }
     }
 }
 
@@ -316,23 +275,40 @@ async fn process_pdfs_recursively(
     let total_files = pdf_files.len();
     println!("\nFound {} PDF files to process", total_files);
 
-    // Create a semaphore to limit concurrent processing
-    let semaphore = Arc::new(Semaphore::new(MAX_CONCURRENT_TASKS));
-    let input_dir = Arc::new(input_dir.to_path_buf());
-    let output_base_dir = Arc::new(output_base_dir.to_path_buf());
-    let log_dir = Arc::new(log_dir.to_path_buf());
+    // Create the request queue with custom configuration
+    let queue_config = QueueConfig {
+        max_tokens: 1000000,                      // 1 million tokens to handle large PDFs
+        refill_tokens: 100000,                    // Refill 100k tokens per interval
+        refill_interval: Duration::from_secs(60), // Refill every minute
+        max_concurrent_requests: MAX_CONCURRENT_TASKS,
+    };
+    let request_queue = Arc::new(RequestQueue::new(queue_config));
+
+    println!("\n{}", "Queue Configuration:".blue().bold());
+    println!("Max Tokens: {}", "1,000,000".cyan());
+    println!("Refill Rate: {} tokens per minute", "100,000".cyan());
+    println!(
+        "Concurrent Tasks: {}\n",
+        MAX_CONCURRENT_TASKS.to_string().cyan()
+    );
 
     // Process files in parallel with controlled concurrency
     let mut tasks = futures::stream::iter(pdf_files.into_iter().map(|pdf_path| {
-        let sem = Arc::clone(&semaphore);
-        let input_dir = Arc::clone(&input_dir);
-        let output_base_dir = Arc::clone(&output_base_dir);
-        let log_dir = Arc::clone(&log_dir);
+        let request_queue = Arc::clone(&request_queue);
+        let input_dir = Arc::new(input_dir.to_path_buf());
+        let output_base_dir = Arc::new(output_base_dir.to_path_buf());
+        let log_dir = Arc::new(log_dir.to_path_buf());
 
         async move {
-            let _permit = sem.acquire().await.unwrap();
-            let result =
-                process_single_pdf(pdf_path.clone(), &input_dir, &output_base_dir, &log_dir).await;
+            let result = process_single_pdf(
+                pdf_path.clone(),
+                &input_dir,
+                &output_base_dir,
+                &log_dir,
+                &request_queue,
+            )
+            .await;
+
             if let Err(e) = result {
                 eprintln!("Error processing {}: {}", pdf_path.display(), e);
             }
